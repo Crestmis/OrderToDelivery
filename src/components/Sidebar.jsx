@@ -24,7 +24,7 @@ const navItems = [
   { path: '/indent', label: 'Indent', icon: FileText },
   { path: '/indent-approval', label: 'Indent Approval', icon: CheckSquare },
   { path: '/send-details', label: 'Send Details', icon: Send },
-  { path: '/dispatch-confirmation', label: 'Dispatch Confirmation', icon: Truck },
+  // { path: '/dispatch-confirmation', label: 'Dispatch Confirmation', icon: Truck },
   { path: '/check-material', label: 'Check Material', icon: Package },
   { path: '/material-production', label: 'Material Production', icon: Factory },
   { path: '/quality-check', label: 'Quality Check', icon: ShieldCheck },

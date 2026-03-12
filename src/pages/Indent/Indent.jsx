@@ -42,6 +42,9 @@ export default function Indent() {
   const [data, setData] = useState(generateDummyData)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [sortColumn, setSortColumn] = useState('')
+  const [sortOrder, setSortOrder] = useState('asc')
+  const [showSort, setShowSort] = useState(false)
 
   const getNextId = () => {
     const num = data.length + 1
@@ -60,6 +63,21 @@ export default function Indent() {
       row.materialName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       row.deliveryLocation.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (!sortColumn) return 0
+
+    const valA = a[sortColumn]
+    const valB = b[sortColumn]
+
+    if (typeof valA === 'number') {
+      return sortOrder === 'asc' ? valA - valB : valB - valA
+    }
+
+    return sortOrder === 'asc'
+      ? String(valA).localeCompare(String(valB))
+      : String(valB).localeCompare(String(valA))
+  })
 
   const getDispatchBadge = (status) => {
     const styles = {
@@ -103,10 +121,54 @@ export default function Indent() {
           />
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-all text-sm">
-            <Filter size={16} />
-            <span className="hidden sm:inline">Filter</span>
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowSort(!showSort)}
+              className="flex items-center justify-center gap-2 
+  px-3 sm:px-4 py-2 sm:py-2.5
+  rounded-xl border border-slate-200 
+  text-slate-500 hover:text-slate-700 hover:bg-slate-50 
+  transition-all text-sm flex-shrink-0"
+            >
+              <Filter size={16} />
+              <span className="hidden sm:inline">Filter</span>
+            </button>
+
+            {showSort && (
+              <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-lg p-3 z-20 space-y-3">
+
+                <div>
+                  <label className="text-xs text-slate-400">Sort Column</label>
+                  <select
+                    value={sortColumn}
+                    onChange={(e) => setSortColumn(e.target.value)}
+                    className="w-full mt-1 border border-slate-200 rounded-lg text-sm p-2"
+                  >
+                    <option value="">None</option>
+                    <option value="indentId">Indent ID</option>
+                    <option value="partyName">Party Name</option>
+                    <option value="materialName">Material</option>
+                    <option value="totalQty">Total Qty</option>
+                    <option value="deliveryLocation">Location</option>
+                    <option value="dispatch">Dispatch</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs text-slate-400">Order</label>
+                  <select
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                    className="w-full mt-1 border border-slate-200 rounded-lg text-sm p-2"
+                  >
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                  </select>
+                </div>
+
+              </div>
+            )}
+          </div>
           <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-all text-sm">
             <Download size={16} />
             <span className="hidden sm:inline">Export</span>
@@ -132,7 +194,7 @@ export default function Indent() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredData.map((row) => (
+              {sortedData.map((row) => (
                 <tr
                   key={row.indentId}
                   className="hover:bg-sky-50/30 transition-colors duration-150"
@@ -165,7 +227,7 @@ export default function Indent() {
 
       {/* Mobile Card View */}
       <div className="md:hidden space-y-3">
-        {filteredData.map((row) => (
+        {sortedData.map((row) => (
           <div key={row.indentId} className="bg-white rounded-2xl p-4 border border-sky-100 shadow-sm card-hover">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-bold text-sky-600">{row.indentId}</span>
